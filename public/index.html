@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TRT CHANNEL - YouTube Clone</title>
+    <meta name="description" content="TRT CHANNEL - Complete YouTube Experience">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-left">
+            <button class="menu-btn" onclick="toggleSidebar()">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="logo">
+                <i class="fab fa-youtube"></i>
+                <span>TRT CHANNEL</span>
+            </div>
+        </div>
+        
+        <div class="header-center">
+            <div class="search-box">
+                <input type="text" id="channelInput" placeholder="Search channel (@handle or URL)">
+                <button onclick="loadChannelVideos()">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+        </div>
+        
+        <div class="header-right">
+            <button class="icon-btn" onclick="toggleTheme()">
+                <i class="fas fa-moon" id="themeIcon"></i>
+            </button>
+            <button class="icon-btn">
+                <i class="fas fa-bell"></i>
+            </button>
+            <button class="icon-btn">
+                <i class="fas fa-user-circle"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-section">
+            <a href="#" class="sidebar-item active">
+                <i class="fas fa-home"></i>                <span>Home</span>
+            </a>
+            <a href="#" class="sidebar-item">
+                <i class="fas fa-fire"></i>
+                <span>Trending</span>
+            </a>
+            <a href="#" class="sidebar-item">
+                <i class="fas fa-music"></i>
+                <span>Music</span>
+            </a>
+            <a href="#" class="sidebar-item">
+                <i class="fas fa-gamepad"></i>
+                <span>Gaming</span>
+            </a>
+            <a href="#" class="sidebar-item">
+                <i class="fas fa-newspaper"></i>
+                <span>News</span>
+            </a>
+        </div>
+        
+        <div class="sidebar-section">
+            <h3>Library</h3>
+            <a href="#" class="sidebar-item">
+                <i class="fas fa-history"></i>
+                <span>History</span>
+            </a>
+            <a href="#" class="sidebar-item">
+                <i class="fas fa-clock"></i>
+                <span>Watch Later</span>
+            </a>
+            <a href="#" class="sidebar-item">
+                <i class="fas fa-thumbs-up"></i>
+                <span>Liked Videos</span>
+            </a>
+        </div>
+        
+        <div class="sidebar-section">
+            <h3>Settings</h3>
+            <div class="setting-item">
+                <label>
+                    <input type="checkbox" id="autoPlay" checked>
+                    <span>Auto-play videos</span>
+                </label>
+            </div>
+            <div class="setting-item">
+                <label>
+                    <input type="checkbox" id="hdQuality" checked>
+                    <span>HD Quality</span>
+                </label>
+            </div>            <div class="setting-item">
+                <label>
+                    <input type="checkbox" id="showComments" checked>
+                    <span>Show Comments</span>
+                </label>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content" id="mainContent">
+        <!-- Status Message -->
+        <div id="statusMessage" class="status-message"></div>
+        
+        <!-- Video Grid -->
+        <div id="videoGrid" class="video-grid"></div>
+        
+        <!-- Load More Button -->
+        <div id="loadMoreContainer" class="load-more-container" style="display: none;">
+            <button onclick="loadMoreVideos()" class="load-more-btn">
+                <i class="fas fa-sync-alt"></i> Load More Videos
+            </button>
+        </div>
+    </main>
+
+    <!-- Video Player Modal -->
+    <div id="videoModal" class="video-modal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeVideoModal()">
+                <i class="fas fa-times"></i>
+            </button>
+            
+            <div class="video-player-container">
+                <div id="videoPlayer"></div>
+            </div>
+            
+            <div class="video-details">
+                <h2 id="videoTitle"></h2>
+                
+                <div class="video-actions">
+                    <div class="video-stats">
+                        <span id="videoViews"></span>
+                        <span id="videoDate"></span>
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <button class="action-btn">
+                            <i class="fas fa-thumbs-up"></i>
+                            <span>Like</span>
+                        </button>                        <button class="action-btn">
+                            <i class="fas fa-thumbs-down"></i>
+                            <span>Dislike</span>
+                        </button>
+                        <button class="action-btn" onclick="shareVideo()">
+                            <i class="fas fa-share"></i>
+                            <span>Share</span>
+                        </button>
+                        <button class="action-btn">
+                            <i class="fas fa-download"></i>
+                            <span>Download</span>
+                        </button>
+                        <button class="action-btn">
+                            <i class="fas fa-ellipsis-h"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="channel-info">
+                    <div class="channel-avatar">
+                        <i class="fas fa-user-circle"></i>
+                    </div>
+                    <div class="channel-details">
+                        <h3 id="channelName"></h3>
+                        <p id="channelSubs"></p>
+                    </div>
+                    <button class="subscribe-btn">Subscribe</button>
+                </div>
+                
+                <div class="video-description">
+                    <p id="videoDescription"></p>
+                </div>
+                
+                <div class="comments-section" id="commentsSection">
+                    <h3>Comments</h3>
+                    <div class="comment-input">
+                        <i class="fas fa-user-circle"></i>
+                        <input type="text" placeholder="Add a comment...">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+  </html>
