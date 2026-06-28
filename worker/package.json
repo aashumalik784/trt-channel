@@ -1,0 +1,13 @@
+{
+  "name": "trt-channel-api",
+  "version": "1.0.0",
+  "description": "TRT CHANNEL - Cloudflare Worker to proxy YouTube API calls",
+  "main": "src/index.js",
+  "scripts": {
+    "deploy": "wrangler deploy",
+    "dev": "wrangler dev"
+  },
+  "devDependencies": {
+    "wrangler": "^3.0.0"
+  }
+}
