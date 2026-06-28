@@ -1,5 +1,5 @@
-// ⚠️ Apne Worker ka URL yahan dalein
-const WORKER_URL = 'https://trt-channel-api.YOUR_SUBDOMAIN.workers.dev';
+// ⚠️ Apni YouTube API Key yahan dalein (Google Cloud Console se)
+const YOUTUBE_API_KEY = 'AIzaSyD...APNI_KEY_YAHAN_DALEIN';
 
 let currentPlaylistId = null;
 let nextPageToken = null;
@@ -47,8 +47,7 @@ async function fetchVideos() {
     // Reset
     if (videoGrid) videoGrid.innerHTML = '';
     nextPageToken = null;
-    allVideosLoaded = false;    currentPlaylistId = null;
-    totalVideos = 0;
+    allVideosLoaded = false;    currentPlaylistId = null;    totalVideos = 0;
     
     // Show loading
     if (loadingAnimation) loadingAnimation.style.display = 'block';
@@ -66,12 +65,12 @@ async function fetchVideos() {
     }
 
     try {
-        // Channel ID fetch karna
-        let channelEndpoint = `${WORKER_URL}/channels?`;
+        // Direct YouTube API call (bina Worker ke!)
+        let channelEndpoint = `https://www.googleapis.com/youtube/v3/channels?part=contentDetails,snippet,statistics&key=${YOUTUBE_API_KEY}&`;
         
         if (input.includes('@')) {
             const handle = input.match(/@([a-zA-Z0-9_\-\.]+)/)[1];
-            channelEndpoint += `handle=${handle}`;
+            channelEndpoint += `forHandle=${handle}`;
             console.log('Fetching channel by handle:', handle);
         } else if (input.includes('/channel/')) {
             const channelId = input.match(/\/channel\/([a-zA-Z0-9_\-]+)/)[1];
@@ -97,8 +96,7 @@ async function fetchVideos() {
             return;
         }
         currentChannelData = channelData.items[0];
-        const channelTitle = currentChannelData.snippet.title;
-        currentPlaylistId = currentChannelData.contentDetails.relatedPlaylists.uploads;
+        const channelTitle = currentChannelData.snippet.title;        currentPlaylistId = currentChannelData.contentDetails.relatedPlaylists.uploads;
 
         console.log('✅ Channel found:', channelTitle);
         console.log('Playlist ID:', currentPlaylistId);
@@ -140,14 +138,14 @@ async function loadMoreVideos() {
     }
 
     try {
-        let videosUrl = `${WORKER_URL}/playlist-items?playlistId=${currentPlaylistId}&maxResults=50`;
+        // Direct YouTube API call (bina Worker ke!)
+        let videosUrl = `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=${currentPlaylistId}&maxResults=50&key=${YOUTUBE_API_KEY}`;
         
         if (nextPageToken) {
             videosUrl += `&pageToken=${nextPageToken}`;
             console.log('Loading next page with token:', nextPageToken);
         }
-        console.log('Fetching videos from:', videosUrl);
-        
+        console.log('Fetching videos from:', videosUrl);        
         const videosRes = await fetch(videosUrl);
         console.log('Videos response status:', videosRes.status);
         
@@ -196,8 +194,7 @@ function renderVideos(items) {
     console.log('Rendering', items.length, 'videos');
     items.forEach((item, index) => {
         try {
-            const videoId = item.snippet.resourceId.videoId;
-            const title = item.snippet.title;
+            const videoId = item.snippet.resourceId.videoId;            const title = item.snippet.title;
             const thumbnail = item.snippet.thumbnails?.high?.url || item.snippet.thumbnails?.default?.url;
             const publishedAt = new Date(item.snippet.publishedAt);
             const timeAgo = getTimeAgo(publishedAt);
@@ -246,8 +243,7 @@ function getTimeAgo(date) {
         week: 604800,        day: 86400,
         hour: 3600,
         minute: 60
-    };
-    
+    };    
     for (const [unit, secondsInUnit] of Object.entries(intervals)) {
         const interval = Math.floor(seconds / secondsInUnit);
         if (interval >= 1) {
@@ -296,8 +292,7 @@ function showToast(message, type = 'info') {
     }
 }
 
-// Auto Fetch Functions
-function startAutoFetch() {
+// Auto Fetch Functionsfunction startAutoFetch() {
     // Har 5 minute me auto fetch
     autoFetchInterval = setInterval(() => {
         console.log('Auto-fetch triggered');
@@ -341,12 +336,12 @@ function autoRefresh() {
     }, 2000);
 }
 
-// Load Specific Channelfunction loadChannel(handle) {
+// Load Specific Channel
+function loadChannel(handle) {
     const channelInput = document.getElementById('channelInput');
     if (channelInput) {
         channelInput.value = handle;
-        fetchVideos();
-    }
+        fetchVideos();    }
 }
 
 function fetchTrending() {
@@ -395,8 +390,7 @@ function openVideoModal(videoId, title, channelTitle, description, publishedAt) 
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
             allowfullscreen>
         </iframe>
-    `;
-    
+    `;    
     modal.classList.add('active');
     document.body.style.overflow = 'hidden';
 }
@@ -445,8 +439,7 @@ function toggleTheme() {
         localStorage.setItem('theme', 'light');
     } else {
         icon.className = 'fas fa-moon';
-        localStorage.setItem('theme', 'dark');
-    }
+        localStorage.setItem('theme', 'dark');    }
 }
 
 function loadTheme() {
