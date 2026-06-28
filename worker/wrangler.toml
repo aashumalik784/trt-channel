@@ -1,0 +1,11 @@
+name = "trt-channel-api"
+main = "src/index.js"
+compatibility_date = "2026-01-01"
+
+# Environment variables
+[vars]
+# API key Cloudflare Dashboard se set karein
+
+# Production settings
+[env.production]
+name = "trt-channel-api-prod"
