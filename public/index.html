@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TRT CHANNEL - YouTube Clone</title>
-    <meta name="description" content="TRT CHANNEL - Complete YouTube Experience">
+    <title>TRT CHANNEL - YouTube Channel Viewer</title>
+    <meta name="description" content="TRT CHANNEL - Latest videos automatically">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -23,22 +23,19 @@
         
         <div class="header-center">
             <div class="search-box">
-                <input type="text" id="channelInput" placeholder="Search channel (@handle or URL)">
-                <button onclick="loadChannelVideos()">
+                <input type="text" id="channelInput" placeholder="Channel URL ya @handle dalein">
+                <button onclick="fetchVideos()">
                     <i class="fas fa-search"></i>
                 </button>
             </div>
         </div>
         
         <div class="header-right">
-            <button class="icon-btn" onclick="toggleTheme()">
+            <button class="icon-btn" onclick="toggleTheme()" title="Theme Change">
                 <i class="fas fa-moon" id="themeIcon"></i>
             </button>
-            <button class="icon-btn">
-                <i class="fas fa-bell"></i>
-            </button>
-            <button class="icon-btn">
-                <i class="fas fa-user-circle"></i>
+            <button class="icon-btn" onclick="autoRefresh()" title="Auto Refresh">
+                <i class="fas fa-sync-alt" id="refreshIcon"></i>
             </button>
         </div>
     </header>
@@ -46,40 +43,33 @@
     <!-- Sidebar -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-section">
-            <a href="#" class="sidebar-item active">
-                <i class="fas fa-home"></i>                <span>Home</span>
-            </a>
-            <a href="#" class="sidebar-item">
+            <h3>Quick Links</h3>
+            <a href="#" class="sidebar-item active" onclick="fetchVideos()">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </a>            <a href="#" class="sidebar-item" onclick="fetchTrending()">
                 <i class="fas fa-fire"></i>
                 <span>Trending</span>
             </a>
-            <a href="#" class="sidebar-item">
-                <i class="fas fa-music"></i>
-                <span>Music</span>
-            </a>
-            <a href="#" class="sidebar-item">
-                <i class="fas fa-gamepad"></i>
-                <span>Gaming</span>
-            </a>
-            <a href="#" class="sidebar-item">
-                <i class="fas fa-newspaper"></i>
-                <span>News</span>
+            <a href="#" class="sidebar-item" onclick="toggleAutoFetch()">
+                <i class="fas fa-bell"></i>
+                <span>Auto Fetch: <span id="autoFetchStatus">ON</span></span>
             </a>
         </div>
         
         <div class="sidebar-section">
-            <h3>Library</h3>
-            <a href="#" class="sidebar-item">
-                <i class="fas fa-history"></i>
-                <span>History</span>
+            <h3>Channels</h3>
+            <a href="#" class="sidebar-item" onclick="loadChannel('@kurulusosmanurduatv')">
+                <i class="fas fa-tv"></i>
+                <span>Kuruluş Osman Urdu</span>
             </a>
-            <a href="#" class="sidebar-item">
-                <i class="fas fa-clock"></i>
-                <span>Watch Later</span>
+            <a href="#" class="sidebar-item" onclick="loadChannel('@TRT')">
+                <i class="fas fa-tv"></i>
+                <span>TRT Official</span>
             </a>
-            <a href="#" class="sidebar-item">
-                <i class="fas fa-thumbs-up"></i>
-                <span>Liked Videos</span>
+            <a href="#" class="sidebar-item" onclick="showAddChannel()">
+                <i class="fas fa-plus-circle"></i>
+                <span>Add Channel</span>
             </a>
         </div>
         
@@ -96,19 +86,37 @@
                     <input type="checkbox" id="hdQuality" checked>
                     <span>HD Quality</span>
                 </label>
-            </div>            <div class="setting-item">
+            </div>
+            <div class="setting-item">
                 <label>
-                    <input type="checkbox" id="showComments" checked>
-                    <span>Show Comments</span>
+                    <input type="checkbox" id="notifications" checked>
+                    <span>New video notifications</span>
                 </label>
             </div>
         </div>
     </aside>
 
-    <!-- Main Content -->
-    <main class="main-content" id="mainContent">
+    <!-- Main Content -->    <main class="main-content" id="mainContent">
+        <!-- Fetch Button Section -->
+        <div class="fetch-section">
+            <button class="fetch-btn" onclick="fetchVideos()">
+                <i class="fas fa-sync-alt" id="fetchIcon"></i>
+                <span id="fetchText">📥 Fetch Latest Videos</span>
+            </button>
+            <div class="fetch-info">
+                <span id="lastFetch">Last fetch: Never</span>
+                <span id="videoCount">Total videos: 0</span>
+            </div>
+        </div>
+
         <!-- Status Message -->
         <div id="statusMessage" class="status-message"></div>
+        
+        <!-- Loading Animation -->
+        <div id="loadingAnimation" class="loading-animation" style="display: none;">
+            <div class="spinner"></div>
+            <p>Latest videos fetch kar rahe hain...</p>
+        </div>
         
         <!-- Video Grid -->
         <div id="videoGrid" class="video-grid"></div>
@@ -116,7 +124,16 @@
         <!-- Load More Button -->
         <div id="loadMoreContainer" class="load-more-container" style="display: none;">
             <button onclick="loadMoreVideos()" class="load-more-btn">
-                <i class="fas fa-sync-alt"></i> Load More Videos
+                <i class="fas fa-plus-circle"></i> Load More Videos
+            </button>
+        </div>
+
+        <!-- No Videos Message -->
+        <div id="noVideos" class="no-videos" style="display: none;">
+            <i class="fas fa-video-slash"></i>
+            <p>Koi videos nahi mili. "Fetch Videos" button dabayein.</p>
+            <button onclick="fetchVideos()" class="primary-btn">
+                <i class="fas fa-sync-alt"></i> Fetch Videos
             </button>
         </div>
     </main>
@@ -128,8 +145,7 @@
                 <i class="fas fa-times"></i>
             </button>
             
-            <div class="video-player-container">
-                <div id="videoPlayer"></div>
+            <div class="video-player-container">                <div id="videoPlayer"></div>
             </div>
             
             <div class="video-details">
@@ -142,23 +158,17 @@
                     </div>
                     
                     <div class="action-buttons">
-                        <button class="action-btn">
+                        <button class="action-btn" onclick="likeVideo()">
                             <i class="fas fa-thumbs-up"></i>
                             <span>Like</span>
-                        </button>                        <button class="action-btn">
-                            <i class="fas fa-thumbs-down"></i>
-                            <span>Dislike</span>
                         </button>
                         <button class="action-btn" onclick="shareVideo()">
                             <i class="fas fa-share"></i>
                             <span>Share</span>
                         </button>
-                        <button class="action-btn">
+                        <button class="action-btn" onclick="downloadVideo()">
                             <i class="fas fa-download"></i>
                             <span>Download</span>
-                        </button>
-                        <button class="action-btn">
-                            <i class="fas fa-ellipsis-h"></i>
                         </button>
                     </div>
                 </div>
@@ -177,18 +187,12 @@
                 <div class="video-description">
                     <p id="videoDescription"></p>
                 </div>
-                
-                <div class="comments-section" id="commentsSection">
-                    <h3>Comments</h3>
-                    <div class="comment-input">
-                        <i class="fas fa-user-circle"></i>
-                        <input type="text" placeholder="Add a comment...">
-                    </div>
-                </div>
             </div>
         </div>
     </div>
 
-    <script src="js/app.js"></script>
-</body>
-  </html>
+    <!-- Notification Toast -->
+    <div id="toast" class="toast"></div>
+
+    <script src="js/app.js"></script></body>
+</html>
