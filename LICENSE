@@ -1,0 +1,32 @@
+## 🎨 Customization
+
+### Colors Change Karne ke Liye
+`public/css/style.css` file me gradient colors change karein:
+```css
+background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+```
+
+### Logo Add Karne ke Liye
+1. Apna logo `public/assets/logo.png` me dalein
+2. `index.html` me add karein:
+```html
+<img src="assets/logo.png" alt="TRT CHANNEL Logo" class="logo">
+```
+
+## 🔒 Security
+
+- YouTube API key Cloudflare Worker me securely store hoti hai
+- API key public nahi hoti
+- Environment variables ka use hota hai
+
+## 📝 License
+
+MIT License - Free to use and modify
+
+## 👨‍💻 Author
+
+**TRT CHANNEL** - Built with ❤️
+
+---
+
+**Note:** Ye project educational purpose ke liye hai. YouTube ki Terms of Service ka respect karein.
